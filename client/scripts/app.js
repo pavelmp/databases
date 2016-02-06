@@ -61,7 +61,6 @@ var app = {
       contentType: 'application/json',
        data: { order: '-createdAt'},
       success: function(data) {
-        console.log('Got the data from server', data)
         // Don't bother if we have nothing to work with
         if (!data || !data.length) { return; }
 
@@ -78,7 +77,7 @@ var app = {
           app.populateMessages(data, animate);
 
           // Store the ID of the most recent message
-          app.lastMessageId = mostRecentMessage.objectId;
+          app.lastMessageId = mostRecentMessage.id;
         //}
       },
       error: function(data) {

@@ -10,7 +10,8 @@ module.exports = {
     }, // a function which produces all the messages
     
     post: function (message,callback) {
-      var queryString = 'INSERT INTO Messages (username, message, roomname) VALUES(' + ['"' + message.username + '"','"' + message.message + '"','"' + message.roomname + '"'].join(',') + ');';
+      message.createdAt = module.exports.dateToSQL(new Date());  
+      var queryString = 'INSERT INTO Messages (username, message, roomname,createdAt) VALUES(' + ['"' + message.username + '"','"' + message.message + '"','"' + message.roomname + '"','"' + message.createdAt + '"'].join(',') + ');';
       db.dbConnection.query(queryString, function(err, resp) {
          if(err){
           console.log('Messed up');
@@ -39,6 +40,15 @@ module.exports = {
         callback(err, results); // all mesages from server
       });
     }
+  },
+
+  dateToSQL: function(JSdate){
+    function twoDigits(d) {
+      if(0 <= d && d < 10) {return '0' + d.toString();}
+      if(-10 < d && d < 0) {return '-0' + (-1*d).toString();}
+      return d.toString();
+    }
+    return JSdate.getUTCFullYear() + "-" + twoDigits(1 + JSdate.getUTCMonth()) + "-" + twoDigits(JSdate.getUTCDate()) + " " + twoDigits(JSdate.getUTCHours()) + ":" + twoDigits(JSdate.getUTCMinutes()) + ":" + twoDigits(JSdate.getUTCSeconds());
   }
 };
 
