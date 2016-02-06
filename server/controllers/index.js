@@ -3,15 +3,22 @@ var models = require('../models');
 module.exports = {
   messages: {
     get: function (req, res) {
-      models.messages.get(function(results){
-        res.json(results);
+      models.messages.get(function(err,results){
+        if(err){
+          console.log('Messed up the select of Message: ',err);
+        } else {
+          res.json(results);
+        }
       });
     }, // a function which handles a get request for all messages
 
     post: function (req, res){
-      console.log(req.body)
-      models.messages.post(req.body, function(results){
-        console.log(results, '!!!!!!');
+      models.messages.post(req.body, function(err,results){
+        if(err){
+          console.log('Messed up the insert of message: ',err);
+        } else {
+          res.json(results);
+        }  
       }); 
     // a function which handles posting a message to the database
     }
@@ -19,8 +26,25 @@ module.exports = {
 
   users: {
     // Ditto as above
-    get: function (req, res) {},
-    post: function (req, res) {}
+    get: function (req, res) {
+      models.users.get(function(err,results){
+        if(err){
+          console.log('Messed up the select in USERS: ',err);
+        } else {
+          res.json(results);
+        }
+      });
+    },
+
+    post: function (req, res) {
+      models.users.post(req.body, function(err,results){
+        if(err){
+          console.log('Messed up the USER insert:', err);
+        } else {
+          res.json(results); 
+        }  
+      });
+    }
   }
 };
 
