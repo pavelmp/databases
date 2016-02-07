@@ -1,44 +1,51 @@
-var db = require('../db');
+var databas = require('../db');
+var db = databas.db;
 
 module.exports = {
   messages: {
     get: function (callback) {
-      var queryString = 'SELECT * FROM Messages;';
-      db.dbConnection.query(queryString, function(err, results) {
-        callback(err,results); // all mesages from server
+      db.Messages.findAll().then(function(messages){
+        callback(messages);
       });
     }, // a function which produces all the messages
     
     post: function (message,callback) {
-      message.createdAt = module.exports.dateToSQL(new Date());  
-      var queryString = 'INSERT INTO Messages (username, message, roomname,createdAt) VALUES(' + ['"' + message.username + '"','"' + message.message + '"','"' + message.roomname + '"','"' + message.createdAt + '"'].join(',') + ');';
-      db.dbConnection.query(queryString, function(err, resp) {
-         if(err){
-          console.log('Messed up');
-         } else {
-           var queryString = 'SELECT * FROM Messages;';
-           db.dbConnection.query(queryString, function(err, results) {
-             callback(err,results); // all mesages from server
-           });
-         } 
-      });
+      message.createdAt = module.exports.dateToSQL(new Date());
+      db.Messages.build(message)
+                 .save()
+                 .then(function() {
+                   db.Messages.findAll().then(function(messages){
+                     callback(messages);
+                   });
+                  });    
     } // a function which can be used to insert a message into the database
   },
 
   users: {
     // Ditto as above.
     get: function (callback) {
-      var queryString = 'SELECT * FROM Users;';
-      db.dbConnection.query(queryString, function(err, results) {
-        callback(err,results); // all mesages from server
+      // var queryString = 'SELECT * FROM Users;';
+      // db.dbConnection.query(queryString, function(err, results) {
+      //   callback(err,results); // all mesages from server
+      // });
+      db.Users.findAll().then(function(users){
+        callback(users);
       });
     },
     post: function (user,callback) {
+      // user.password = 'NULL';
+      // var queryString = 'INSERT INTO Users (username, password) VALUES(' + '"' + user.username + '", "' + user.password + '");';
+      // db.dbConnection.query(queryString, function(err, results) {
+      //   callback(err, results); // all mesages from server
+      // });
       user.password = 'NULL';
-      var queryString = 'INSERT INTO Users (username, password) VALUES(' + '"' + user.username + '", "' + user.password + '");';
-      db.dbConnection.query(queryString, function(err, results) {
-        callback(err, results); // all mesages from server
-      });
+      db.Users.build(user)
+                 .save()
+                 .then(function() {
+                   db.Users.findAll().then(function(users){
+                     callback(users);
+                   });
+                  });
     }
   },
 
